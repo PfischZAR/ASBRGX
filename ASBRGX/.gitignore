@@ -1,0 +1,8 @@
+*.o
+*.log
+*.tmp
+temp/
+sed_editor
+test.txt
+*~
+*.swp

@@ -18,90 +18,53 @@ $(TARGET): $(OBJECTS)
 
 # Очистка
 clean:
-	rm -f $(TARGET) $(OBJECTS) test.txt temp_* 2>/dev/null || true
+	rm -f $(TARGET) $(OBJECTS) *.txt temp_* 2>/dev/null || true
 
-# Тестирование регулярных выражений
+# Тестирование
 test: $(TARGET)
-	@echo "=== Тестирование sed_editor с регулярными выражениями ==="
+	@echo "=== Тестирование sed_editor ==="
 	
-	@echo "Создаем тестовый файл..."
-	@printf "line1\nline2\n123 apple\n456 banana\n789 cherry\nempty line\n\nlast line\n" > test.txt
+	@echo "1. Создаем тестовый файл..."
+	@printf "first line\nsecond line\n123 number\n456 another\nlast line\n" > test.txt
 	
 	@echo ""
-	@echo "1. Тест: Добавление префикса в начало каждой строки"
-	@echo "Файл до:"
-	@cat test.txt
-	@echo ""
-	@echo "Выполняем: 's/^/>>> /'"
+	@echo "2. Тест: Добавление префикса"
+	@echo "Команда: ./sed_editor test.txt 's/^/>>> /'"
 	@./$(TARGET) test.txt 's/^/>>> /'
-	@echo "Файл после:"
 	@cat test.txt
 	
 	@echo ""
-	@echo ""
-	@echo "2. Тест: Добавление суффикса в конец каждой строки"
-	@echo "Выполняем: 's/$$/ [end]/'"
-	@./$(TARGET) test.txt 's/$/ [end]/'
-	@echo "Файл после:"
+	@echo "3. Тест: Добавление суффикса"
+	@echo "Команда: ./sed_editor test.txt 's/\$$/ [END]/'"
+	@./$(TARGET) test.txt 's/$$/ [END]/'
 	@cat test.txt
 	
 	@echo ""
-	@echo ""
-	@echo "3. Тест: Замена всех чисел на 'NUMBER'"
-	@echo "Выполняем: 's/[0-9]+/NUMBER/'"
+	@echo "4. Тест: Замена чисел"
+	@echo "Команда: ./sed_editor test.txt 's/[0-9]+/NUMBER/'"
 	@./$(TARGET) test.txt 's/[0-9]+/NUMBER/'
-	@echo "Файл после:"
 	@cat test.txt
 	
 	@echo ""
-	@echo ""
-	@echo "4. Тест: Удаление пустых строк"
-	@echo "Выполняем: '/^$$/d'"
-	@./$(TARGET) test.txt '/^$/d'
-	@echo "Файл после:"
+	@echo "5. Тест: Удаление строк с 'another'"
+	@echo "Команда: ./sed_editor test.txt '/another/d'"
+	@./$(TARGET) test.txt '/another/d'
 	@cat test.txt
 	
-	@echo ""
-	@echo ""
-	@echo "5. Тест: Удаление строк, содержащих 'apple' или 'banana'"
-	@echo "Выполняем: '/apple\\|banana/d'"
-	@./$(TARGET) test.txt '/apple\|banana/d'
-	@echo "Файл после:"
-	@cat test.txt
-	
+	@rm -f test.txt
 	@echo ""
 	@echo "=== Тестирование завершено ==="
-	@rm -f test.txt
 
-# Тестирование базовых примеров из задания
-test-basic: $(TARGET)
-	@echo "=== Базовые тесты из задания ==="
-	
-	@echo "Создаем тестовый файл..."
-	@printf "first line\nsecond line\nthird line\n" > input.txt
-	
+# Быстрый тест
+quick-test: $(TARGET)
+	@echo "=== Быстрый тест ==="
+	@echo "test line" > qtest.txt
+	@echo "another line" >> qtest.txt
+	@echo "Исходный файл:"
+	@cat qtest.txt
 	@echo ""
-	@echo "1. Добавление суффикса: ./sed_editor input.txt 's/$$/suffix/'"
-	@./$(TARGET) input.txt 's/$/suffix/'
-	@cat input.txt
-	
-	@echo ""
-	@echo "2. Замена текста: ./sed_editor input.txt 's/line/LINE/'"
-	@./$(TARGET) input.txt 's/line/LINE/'
-	@cat input.txt
-	
-	@echo ""
-	@echo "3. Удаление строк: ./sed_editor input.txt '/second/d'"
-	@./$(TARGET) input.txt '/second/d'
-	@cat input.txt
-	
-	@echo ""
-	@echo "4. Добавление префикса: ./sed_editor input.txt 's/^/prefix/'"
-	@./$(TARGET) input.txt 's/^/prefix/'
-	@cat input.txt
-	
-	@rm -f input.txt
-	@echo ""
-	@echo "=== Базовые тесты завершены ==="
+	@echo "После добавления префикса:"
+	@./$(TARGET) qtest.txt 's/^/PREFIX /' && cat qtest.txt || echo "Ошибка"
+	@rm -f qtest.txt
 
-.PHONY: all clean test test-basic
+.PHONY: all clean test quick-test
